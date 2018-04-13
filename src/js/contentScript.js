@@ -1,59 +1,49 @@
 /* global chrome */
 import Stackedit from 'stackedit-js';
 import '../img/icon.svg';
+import presets from './presets';
 import settings from './settings';
+
+const buttonSize = 24;
+const buttonMargin = 7;
+
+const styleContent = `
+.stackedit-open-button {
+  display: block;
+  position: absolute;
+  width: ${buttonSize}px;
+  height: ${buttonSize}px;
+  background: no-repeat url("${chrome.runtime.getURL('icon.svg')}");
+  background-size: ${buttonSize}px ${buttonSize}px;
+  z-index: 9999;
+  opacity: 0.67;
+  transition: opacity 0.25s;
+}
+
+.stackedit-open-button:focus,
+.stackedit-open-button:hover {
+  opacity: 1;
+}
+`;
 
 settings.getSites()
   .then((sites) => {
-    const presets = {
-      default: {},
-      gfm: {
-        extensions: {
-          preset: 'gfm',
-        },
-      },
-      commonmark: {
-        extensions: {
-          preset: 'commonmark',
-        },
-      },
-      stackexchange: {
-        extensions: {
-          preset: 'zero',
-          katex: {
-            enabled: true,
-          },
-        },
-      },
-    };
-
-    const buttonStyle = {
-      position: 'absolute',
-      fontSize: '12px',
-      textDecoration: 'underline',
-      height: '20px',
-      lineHeight: '20px',
-      paddingLeft: '25px',
-      background: `left no-repeat url("${chrome.runtime.getURL('icon.svg')}")`,
-      backgroundSize: '20px 20px',
-      margin: '-25px 0 0 5px',
-      zIndex: 9999,
-    };
+    const styleEl = document.createElement('style');
+    styleEl.type = 'text/css';
+    styleEl.innerHTML = styleContent;
+    document.head.appendChild(styleEl);
 
     function decorateTextarea(el, preset) {
-      if (!el.$seIsDecorated) {
-        el.hasStackEditButton = true;
-        el.style.paddingBottom = '30px';
+      if (!el.$moveStackeditButton) {
         const buttonEl = document.createElement('a');
         buttonEl.href = 'javascript:void(0)'; // eslint-disable-line no-script-url
-        buttonEl.textContent = 'Edit with StackEdit';
-        Object.keys(buttonStyle).forEach((key) => {
-          buttonEl.style[key] = buttonStyle[key];
-        });
-        el.parentNode.insertBefore(buttonEl, el.nextSibling);
-        el.parentNode.insertBefore(document.createElement('div'), buttonEl);
+        buttonEl.className = 'stackedit-open-button';
+        buttonEl.title = 'Edit with StackEdit';
+        el.parentNode.insertBefore(buttonEl, el);
         buttonEl.addEventListener('click', () => {
-          const stackedit = new Stackedit({ url: chrome.runtime.getURL('frame.html') });
+          const stackedit = new Stackedit({
+            url: chrome.runtime.getURL('frame.html'),
+          });
           stackedit.on('fileChange', (file) => {
             el.value = file.content.text;
           });
@@ -65,30 +55,39 @@ settings.getSites()
             },
           });
         });
-        el.$seIsDecorated = true;
+        el.$moveStackeditButton = () => {
+          const rect = el.getBoundingClientRect();
+          const left = `${((el.offsetLeft + rect.width) - buttonSize) - buttonMargin}px`;
+          if (buttonEl.style.left !== left) {
+            buttonEl.style.left = left;
+          }
+          const top = `${((el.offsetTop + rect.height) - buttonSize) - buttonMargin}px`;
+          if (buttonEl.style.top !== top) {
+            buttonEl.style.top = top;
+          }
+        };
       }
+      el.$moveStackeditButton();
     }
 
-    let debounceTimeoutId;
     function decorateAll(preset) {
-      clearTimeout(debounceTimeoutId);
-      debounceTimeoutId = setTimeout(() => {
-        const textareaEls = document.querySelectorAll('textarea');
-        for (let i = 0; i < textareaEls.length; i += 1) {
-          decorateTextarea(textareaEls[i], preset);
-        }
-      }, 100);
+      const textareaEls = document.getElementsByTagName('textarea');
+      for (let i = 0; i < textareaEls.length; i += 1) {
+        decorateTextarea(textareaEls[i], preset);
+      }
     }
 
     sites.some((site) => {
-      if (location.href.indexOf(site.url) !== 0) {
+      if (!location.href.match(site.regex)) {
         return false;
       }
       const preset = presets[site.preset];
-      const bodyObserver = new MutationObserver(() => decorateAll(preset));
-      bodyObserver.observe(document.body, {
+      const observer = new MutationObserver(() => decorateAll(preset));
+      observer.observe(document.body, {
         childList: true,
         subtree: true,
+        attributes: true,
+        attributeFilter: ['style', 'class'],
       });
       decorateAll(preset);
       return true;

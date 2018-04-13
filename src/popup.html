@@ -1,33 +1,108 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <style>
-      body {
-        background-color: #fff;
-        margin: 10px;
-        width: 250px;
-      }
 
-      .conf__entry input {
-        width: 160px;
-      }
+<head>
+  <style>
+    body {
+      background-color: #fff;
+      width: 350px;
+      margin: 10px;
+    }
 
-      .conf__entry select {
-        width: 80px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="conf">
-      <div class="conf__entry">
-        <input value="https://github.com/*">
-        <select value="gfm">
-          <option name="default">Default</option>
-          <option name="commonmark">CommonMark</option>
-          <option name="gfm">GitHub Flavored Markdown</option>
-          <option name="stackexchange">Stack Exchange Markdown</option>
-        </select>
-      </div>
-    </div>
-  </body>
+    input,
+    select {
+      background-color: #fff;
+      font-family: inherit;
+      font-weight: 400;
+      font-size: 1.05em;
+      box-sizing: border-box;
+      padding: 0 0.3rem;
+      color: inherit;
+      height: 1.6rem;
+      border: 1px solid #d8d8d8;
+      border-radius: 5px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #0c93e4;
+      outline: none;
+    }
+
+    button {
+      color: inherit;
+      font-size: 14px;
+      background-color: transparent;
+      display: inline-block;
+      height: auto;
+      padding: 8px 10px;
+      font-weight: 400;
+      line-height: 1.4;
+      text-transform: uppercase;
+      overflow: hidden;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      background-image: none;
+      border: 0;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    button:active,
+    button:focus,
+    button:hover {
+      color: #333;
+      background-color: rgba(0, 0, 0, 0.05);
+      outline: 0;
+      text-decoration: none;
+    }
+
+    .sites {
+      max-height: 300px;
+      overflow: auto;
+      margin-right: -10px;
+    }
+
+    .site {
+      margin-top: 4px;
+    }
+
+    .site input,
+    .input-header {
+      width: 230px;
+    }
+
+    .site select,
+    .select-header {
+      width: 100px;
+      margin-left: 4px;
+    }
+
+    .input-header,
+    .select-header {
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .button-group {
+      margin-top: 10px;
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <span class="input-header">URL</span><span class="select-header">Preset</span>
+  </div>
+  <div class="sites">
+  </div>
+  <div class="button-group">
+    <button id="reset-button">Reset</button><button id="cancel-button">Cancel</button><button id="ok-button">Ok</button>
+  </div>
+  <script src="frame.bundle.js"></script>
+</body>
+
 </html>
