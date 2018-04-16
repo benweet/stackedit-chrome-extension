@@ -31,6 +31,6 @@
     "write-file-webpack-plugin": "3.4.2"
   },
   "dependencies": {
-    "stackedit-js": "^1.0.4"
+    "stackedit-js": "^1.0.5"
   }
 }
