@@ -16,8 +16,8 @@ const styleContent = `
   background: no-repeat url("${chrome.runtime.getURL('icon.svg')}");
   background-size: ${buttonSize}px ${buttonSize}px;
   z-index: 9999;
-  opacity: 0.67;
-  transition: opacity 0.25s;
+  opacity: 0.5;
+  transition: opacity 0.5s;
 }
 
 .stackedit-open-button:focus,
