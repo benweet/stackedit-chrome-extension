@@ -89,6 +89,7 @@ settings.getSites()
         attributes: true,
         attributeFilter: ['style', 'class'],
       });
+      window.addEventListener('resize', () => decorateAll(preset));
       decorateAll(preset);
       return true;
     });
