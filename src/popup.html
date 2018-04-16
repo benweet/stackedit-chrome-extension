@@ -30,7 +30,7 @@
     }
 
     button {
-      color: inherit;
+      color: #444;
       font-size: 14px;
       background-color: transparent;
       display: inline-block;
@@ -53,7 +53,7 @@
     button:active,
     button:focus,
     button:hover {
-      color: #333;
+      color: #444;
       background-color: rgba(0, 0, 0, 0.05);
       outline: 0;
       text-decoration: none;
@@ -94,6 +94,9 @@
 </head>
 
 <body>
+  <p>
+    The StackEdit button will be added to textareas on the following sites:
+  </p>
   <div class="header">
     <span class="input-header">URL</span><span class="select-header">Preset</span>
   </div>
@@ -102,7 +105,6 @@
   <div class="button-group">
     <button id="reset-button">Reset</button><button id="cancel-button">Cancel</button><button id="ok-button">Ok</button>
   </div>
-  <script src="frame.bundle.js"></script>
 </body>
 
 </html>

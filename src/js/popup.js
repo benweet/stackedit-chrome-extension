@@ -3,6 +3,7 @@ import '../img/icon-32.png';
 import '../img/icon-64.png';
 import '../img/icon-128.png';
 import '../img/icon-256.png';
+import '../img/icon-512.png';
 import presets from './presets';
 import settings from './settings';
 
@@ -18,12 +19,12 @@ const createEl = (parentEl, tag, props = {}) => {
 let rows;
 const makeRows = (sites) => {
   const sitesEl = document.querySelector('.sites');
-  let onInput;
+  let addExtraRow;
   const addRow = (site = {}) => {
     const row = {};
     row.divEl = createEl(sitesEl, 'div', { className: 'site' });
     row.inputEl = createEl(row.divEl, 'input', { type: 'text', value: site.url || '' });
-    row.inputEl.addEventListener('input', () => onInput());
+    row.inputEl.addEventListener('input', () => addExtraRow());
     row.selectEl = createEl(row.divEl, 'select');
     Object.keys(presets).forEach((key) => {
       createEl(row.selectEl, 'option', { name: key, textContent: key });
@@ -36,14 +37,13 @@ const makeRows = (sites) => {
   sitesEl.innerHTML = '';
   sites.forEach(site => addRow(site));
 
-  onInput = () => {
+  addExtraRow = () => {
     const lastRow = rows[rows.length - 1];
-    const lastValue = lastRow.inputEl.value.trim();
-    if (lastValue) {
+    if (!lastRow || lastRow.inputEl.value.trim()) {
       addRow();
     }
   };
-  onInput();
+  addExtraRow();
 };
 
 document.getElementById('reset-button').addEventListener('click', () => makeRows(settings.defaultSites));
