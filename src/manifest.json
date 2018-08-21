@@ -1,7 +1,7 @@
 {
   "name": "StackEdit Markdown Extension",
   "description": "Add StackEdit to any web site that supports Markdown",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "manifest_version": 2,
   "icons": {
     "16": "icon-16.png",

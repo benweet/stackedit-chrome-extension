@@ -1,10 +1,10 @@
 const iframeEl = document.querySelector('iframe');
 let parentOrigin;
-const params = (location.hash || '').slice(1).split('&').map((arg) => {
+const params = (window.location.hash || '').slice(1).split('&').map((arg) => {
   const split = arg.split('=');
   if (split[0] === 'origin') {
     parentOrigin = decodeURIComponent(split[1]);
-    return `origin=${encodeURIComponent(document.origin)}`;
+    return `origin=${encodeURIComponent(origin)}`;
   }
   return arg;
 });

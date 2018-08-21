@@ -5,17 +5,14 @@ import presets from './presets';
 import settings from './settings';
 
 const buttonSize = 24;
-const buttonMargin = 7;
-
 const styleContent = `
 .stackedit-open-button {
-  display: block;
   position: absolute;
   width: ${buttonSize}px;
   height: ${buttonSize}px;
   background: no-repeat url("${chrome.runtime.getURL('icon.svg')}");
   background-size: ${buttonSize}px ${buttonSize}px;
-  z-index: 9999;
+  cursor: pointer;
   opacity: 0.5;
   transition: opacity 0.5s;
 }
@@ -35,20 +32,26 @@ settings.getSites()
 
     function decorateTextarea(el, preset) {
       if (!el.$moveStackeditButton) {
-        const buttonEl = document.createElement('a');
-        buttonEl.href = 'javascript:void(0)'; // eslint-disable-line no-script-url
+        const buttonEl = document.createElement('span');
         buttonEl.className = 'stackedit-open-button';
         buttonEl.title = 'Edit with StackEdit';
-        el.parentNode.insertBefore(buttonEl, el);
+        if (el.nextSibling) {
+          el.parentNode.insertBefore(buttonEl, el.nextSibling);
+        } else {
+          el.parentNode.appendChild(buttonEl);
+        }
         buttonEl.addEventListener('click', () => {
           const stackedit = new Stackedit({
             url: chrome.runtime.getURL('frame.html'),
           });
           stackedit.on('fileChange', (file) => {
             el.value = file.content.text;
+            const event = document.createEvent('Event');
+            event.initEvent('input', true, true);
+            el.dispatchEvent(event);
           });
           stackedit.openFile({
-            name: location.hostname,
+            name: window.location.hostname,
             content: {
               text: el.value,
               properties: preset,
@@ -57,14 +60,17 @@ settings.getSites()
         });
         el.$moveStackeditButton = () => {
           const rect = el.getBoundingClientRect();
-          const left = `${((el.offsetLeft + rect.width) - buttonSize) - buttonMargin}px`;
-          if (buttonEl.style.left !== left) {
-            buttonEl.style.left = left;
-          }
-          const top = `${((el.offsetTop + rect.height) - buttonSize) - buttonMargin}px`;
-          if (buttonEl.style.top !== top) {
-            buttonEl.style.top = top;
-          }
+          const paddingRight = parseFloat(getComputedStyle(el).getPropertyValue('padding-right'));
+          const paddingBottom = parseFloat(getComputedStyle(el).getPropertyValue('padding-bottom'));
+          Object.entries({
+            display: !el.disabled && rect.width && rect.height ? 'block' : 'none',
+            left: `${((el.offsetLeft + rect.width) - buttonSize) - paddingRight}px`,
+            top: `${((el.offsetTop + rect.height) - buttonSize) - paddingBottom}px`,
+          }).forEach(([key, value]) => {
+            if (buttonEl.style[key] !== value) {
+              buttonEl.style[key] = value;
+            }
+          });
         };
       }
       el.$moveStackeditButton();
@@ -78,7 +84,7 @@ settings.getSites()
     }
 
     sites.some((site) => {
-      if (!location.href.match(site.regex)) {
+      if (!window.location.href.match(site.regex)) {
         return false;
       }
       const preset = presets[site.preset];
